@@ -18,7 +18,7 @@ export default function Home() {
     window.location.href = `/pagamento?item=${index}`; // Adicione parâmetros se necessário
   };
 
-  const isButtonVisible = selectedItems.length > 1;
+  const isButtonVisible = selectedItems.length;
 
   return (
     <div className="flex min-h-screen flex-col bg-cednetGray">
@@ -27,15 +27,16 @@ export default function Home() {
           <img src="../public/images/logo.png" alt="" className="mr-2 h-8" />
           <h1 className="text-lg font-bold text-cednetText">GRUPO CEDNET</h1>
         </div>
-        <button className="rounded bg-cednetButton px-4 py-2 text-white hover:bg-cednetButtonHover">
+        <button className="rounded bg-cednetButton px-2 py-1 text-white hover:bg-cednetButtonHover">
           Nova Consulta
         </button>
       </header>
 
-      <main className="flex flex-grow items-center justify-center p-4">
+      <main className="sticky top-0 flex flex-grow items-center justify-center px-4 pb-10 pt-2">
         <div className="w-full max-w-4xl rounded-lg bg-cednetWhite p-6 shadow-md">
           <p className="mb-4 text-lg font-medium text-black">
-            Bem vindo, <strong>Luan Vinícius Paiva dos Santos!</strong> 😊
+            Bem vindo,
+            <br /> <strong>Luan Vinícius Paiva dos Santos!</strong> 😊
           </p>
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
