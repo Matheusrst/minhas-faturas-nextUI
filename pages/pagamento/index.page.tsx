@@ -1,7 +1,16 @@
 import React from "react";
+import { useRouter } from "next/router"; // Importando o useRouter
 import { ItensDetails } from "./components/itens";
 
 export default function Pagamento() {
+  const router = useRouter(); // Inicializando o router
+
+  const handlePagarAgora = (e: React.FormEvent) => {
+    e.preventDefault(); // Previne o envio do formulário
+    // Redireciona para a página de comprovante ao clicar no botão
+    router.push("/comprovante");
+  };
+
   return (
     <div className="relative h-screen w-screen bg-cednetBlue p-0 md:p-4">
       {/* Faixa branca na parte inferior */}
@@ -35,7 +44,10 @@ export default function Pagamento() {
         </div>
 
         {/* Coluna da direita */}
-        <form className="flex w-full flex-col justify-between bg-gray-200 md:w-[30rem] md:rounded-r-[.8rem]">
+        <form
+          className="flex w-full flex-col justify-between bg-gray-200 md:w-[30rem] md:rounded-r-[.8rem]"
+          onSubmit={handlePagarAgora} // Previne o envio de formulário
+        >
           <div className="space-y-4 p-6">
             {/* Cartão */}
             <div className="flex items-center justify-center">
@@ -88,7 +100,10 @@ export default function Pagamento() {
             </div>
           </div>
           {/* Botão */}
-          <button className="mt-6 w-full bg-cednetButton py-3 text-lg font-semibold text-white hover:bg-cednetButtonHover md:rounded-br-[.8rem]">
+          <button
+            type="submit" // O tipo 'submit' vai disparar o onSubmit do formulário
+            className="mt-6 w-full bg-cednetButton py-3 text-lg font-semibold text-white hover:bg-cednetButtonHover md:rounded-br-[.8rem]"
+          >
             Pagar agora
           </button>
         </form>

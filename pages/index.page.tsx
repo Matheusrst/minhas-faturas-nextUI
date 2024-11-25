@@ -32,7 +32,7 @@ export default function Home() {
         </button>
       </header>
 
-      <main className="sticky top-0 flex flex-grow items-center justify-center px-4 pb-10 pt-2">
+      <main className="sticky top-0 flex flex-grow items-center justify-center px-4 pt-4 md:pb-[20rem]">
         <div className="w-full max-w-4xl rounded-lg bg-cednetWhite p-6 shadow-md">
           <p className="mb-4 text-lg font-medium text-black">
             Bem vindo,
