@@ -24,7 +24,7 @@ export default function Comprovante() {
         </header>
 
         <section className="flex-grow px-6">
-          <h1 className="text-[1.5rem] font-bold text-black">
+          <h1 className="text-[1.8rem] font-bold text-black">
             Comprovante de Pagamento
           </h1>
           <p className="mt-2 text-sm text-blue-600">21 out 2024 às 13:17</p>

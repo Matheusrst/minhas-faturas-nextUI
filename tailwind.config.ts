@@ -11,8 +11,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-sans)"],
-        mono: ["var(--font-mono)"],
+        sans: ["'Roboto'", "Arial", "sans-serif"],
+        mono: ["'Inter'", "monospace"],
       },
       colors: {
         cednetBlue: '#004D8C',
