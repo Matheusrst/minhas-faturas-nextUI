@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Barcode, CreditCard, QrCode } from "lucide-react";
+import { Barcode, CreditCard, QrCode, ShoppingCart } from "lucide-react";
 
 export default function Home() {
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
@@ -13,23 +13,45 @@ export default function Home() {
   };
 
   const handleIconClick = (index: number) => {
-    // Lógica para redirecionar para a página de pagamento
     console.log(`Redirecionando para pagamento do item ${index}`);
-    window.location.href = `/pagamento?item=${index}`; // Adicione parâmetros se necessário
+    window.location.href = `/pagamento?item=${index}`;
   };
 
-  const isButtonVisible = selectedItems.length;
+  const handleGoToPayment = () => {
+    window.location.href = "/pagamento";
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-cednetGray">
       <header className="flex items-center justify-between bg-cednetWhite p-4 shadow-md">
         <div className="flex items-center">
-          <img src="../public/images/logo.png" alt="" className="mr-2 h-8" />
-          <h1 className="text-lg font-bold text-cednetText">GRUPO CEDNET</h1>
+          <img
+            src="../public/images/logo-ced-net.png"
+            alt="cednet"
+            className="mr-2 h-8"
+          />
         </div>
-        <button className="rounded bg-cednetButton px-2 py-1 text-white hover:bg-cednetButtonHover">
-          Nova Consulta
-        </button>
+        <div className="flex items-center space-x-2">
+          <button
+            className="rounded bg-cednetButton px-2 py-1 text-white hover:bg-cednetButtonHover"
+            onClick={() => (window.location.href = "")}
+          >
+            Nova Consulta
+          </button>
+          <div className="relative">
+            <button
+              className="flex h-8 w-8 items-center justify-center rounded bg-blue-800 hover:bg-blue-900"
+              onClick={() => (window.location.href = "")}
+            >
+              <ShoppingCart className="h-5 w-5 text-white" />
+            </button>
+            {selectedItems.length > 0 && (
+              <span className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-orange-500 text-xs font-bold text-white">
+                {selectedItems.length}
+              </span>
+            )}
+          </div>
+        </div>
       </header>
 
       <main className="sticky top-0 flex flex-grow items-center justify-center px-4 pt-4 md:pb-[20rem]">
@@ -96,11 +118,11 @@ export default function Home() {
         </div>
       </main>
 
-      {isButtonVisible && (
+      {selectedItems.length > 0 && (
         <footer className="fixed bottom-0 left-0 right-0 bg-cednetBlue p-2 text-center">
           <button
             className="rounded bg-cednetBlue px-4 py-2 font-semibold text-cednetWhite"
-            onClick={() => (window.location.href = "/pagamento")}
+            onClick={handleGoToPayment}
           >
             Ir para o Pagamento...
           </button>
