@@ -21,7 +21,7 @@ const Header = () => {
         <div className="relative">
           <button
             className="flex h-8 w-16 items-center justify-center rounded bg-[#ff8000] hover:bg-[#cc6600]"
-            onClick={() => (window.location.href = "")}
+            onClick={() => (window.location.href = "/")}
           >
             Faturas
           </button>
