@@ -17,7 +17,7 @@ export default function Comprovante() {
       >
         <header className="flex items-center p-6">
           <img
-            src="../public/images/logo.png"
+            src="/images/logo-ced-net.png"
             alt="Grupo Cednet"
             className="mr-3 h-10"
           />

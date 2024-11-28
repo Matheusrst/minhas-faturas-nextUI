@@ -1,23 +1,21 @@
-// PagamentoCard.tsx
-import React from "react";
-import { ItensDetails } from "./itens"; // Ajuste a importação se necessário
+import { useRouter } from "next/router";
+import { ItensDetails } from "../pagamento/components/itens";
 
-interface PagamentoCardProps {
-  handlePagarAgora: (e: React.FormEvent) => void; // Recebe a função de pagamento como prop
-}
+export function Page() {
+  const router = useRouter();
 
-const PagamentoCard: React.FC<PagamentoCardProps> = ({ handlePagarAgora }) => {
+  const handlePagarAgora = (e: React.FormEvent) => {
+    e.preventDefault();
+    router.push("/comprovante"); // Redireciona para a página de comprovante
+  };
+
   return (
-    <div className="relative flex items-center justify-center bg-cednetBlue p-0 pt-[80px] md:p-4">
-      {/* Faixa branca atrás do card principal */}
-      <div className="absolute bottom-0 left-0 z-0 h-[23.1%] w-full bg-white"></div>
-
-      {/* Card Principal */}
-      <div className="relative z-[999] mx-auto flex max-w-5xl flex-col bg-cednetWhite shadow-lg md:flex-row md:rounded-[.8rem]">
+    <div className="mt-4 w-[75vw] xl:w-[65vw]">
+      <div className="mx-auto flex max-w-4xl flex-col bg-cednetWhite shadow-lg md:w-[56rem] md:flex-row md:rounded-[.8rem]">
         {/* Coluna da esquerda */}
         <div className="w-full p-6 md:w-3/4">
           <img
-            src="/public/images/logo.png"
+            src="/images/logo-ced-net.png"
             alt="Cednet Logo"
             className="mb-8 h-10 text-cednetBlue"
           />
@@ -107,6 +105,4 @@ const PagamentoCard: React.FC<PagamentoCardProps> = ({ handlePagarAgora }) => {
       </div>
     </div>
   );
-};
-
-export default PagamentoCard;
+}
