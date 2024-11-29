@@ -1,23 +1,15 @@
-import React, { useState } from "react";
 import { ShoppingCart } from "lucide-react";
+import { useSelectedItems } from "@/contexts/SelectedItemsContext";
 
 export function Header() {
-  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const { selectedItems } = useSelectedItems();
 
-  const handleCheckboxChange = (index: number) => {
-    setSelectedItems((prev) =>
-      prev.includes(index)
-        ? prev.filter((item) => item !== index)
-        : [...prev, index],
-    );
-  };
-
-  // Redireciona para a página de pagamento com os itens selecionados
-  const handleCartClick = () => {
+  const handleGoToPayment = () => {
     if (selectedItems.length > 0) {
-      window.location.href = "/pagamento"; // Redireciona para a página de pagamento
+      const itemsQuery = selectedItems.join(",");
+      window.location.href = `/pagamento?items=${itemsQuery}`;
     } else {
-      alert("Nenhum item selecionado");
+      alert("Por favor, selecione ao menos um item para prosseguir.");
     }
   };
 
@@ -36,7 +28,7 @@ export function Header() {
         <div className="relative">
           <button
             className="flex h-8 w-8 items-center justify-center rounded bg-blue-800 hover:bg-blue-900"
-            onClick={handleCartClick} // Redireciona para o pagamento ao clicar
+            onClick={handleGoToPayment} // Use a função handleGoToPayment
           >
             <ShoppingCart className="h-5 w-5 text-white" />
           </button>

@@ -1,25 +1,12 @@
-import { useState } from "react";
+import { useSelectedItems } from "@/contexts/SelectedItemsContext"; // Certifique-se que o caminho está correto
 import { Barcode, CreditCard, QrCode } from "lucide-react";
 
 export function Page() {
-  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const { selectedItems, toggleItem, selectAllItems, clearAllItems } =
+    useSelectedItems();
 
   const handleCheckboxChange = (index: number) => {
-    setSelectedItems((prev) =>
-      prev.includes(index)
-        ? prev.filter((item) => item !== index)
-        : [...prev, index],
-    );
-  };
-
-  // Marcar ou desmarcar todos os itens
-  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const isChecked = e.target.checked;
-    if (isChecked) {
-      setSelectedItems(Array.from({ length: 7 }, (_, i) => i)); // Seleciona todos os itens
-    } else {
-      setSelectedItems([]); // Desmarca todos os itens
-    }
+    toggleItem(index);
   };
 
   const handleIconClick = (index: number) => {
@@ -30,8 +17,6 @@ export function Page() {
   const handleGoToPayment = () => {
     window.location.href = "/pagamento";
   };
-
-  const isAllSelected = selectedItems.length === 7;
 
   return (
     <div className="mt-4 w-[75vw] xl:w-[65vw]">
@@ -47,8 +32,13 @@ export function Page() {
                 <th className="border p-2 text-left text-black">
                   <input
                     type="checkbox"
-                    checked={isAllSelected}
-                    onChange={handleSelectAll} // Chama a função para selecionar todos
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        selectAllItems();
+                      } else {
+                        clearAllItems(); // Chama a função para limpar todos os itens
+                      }
+                    }}
                   />
                 </th>
                 <th className="p-2 text-left text-black">Código</th>
@@ -65,8 +55,8 @@ export function Page() {
                     <td className="p-2 text-left text-black">
                       <input
                         type="checkbox"
-                        checked={selectedItems.includes(index)} // Verifica se o item está selecionado
-                        onChange={() => handleCheckboxChange(index)} // Chama a função para marcar/desmarcar
+                        checked={selectedItems.includes(index)}
+                        onChange={() => handleCheckboxChange(index)}
                       />
                     </td>
                     <td className="p-2 text-black">1288279</td>
@@ -89,7 +79,6 @@ export function Page() {
         </div>
       </div>
 
-      {/* Botão fixo no rodapé */}
       {selectedItems.length > 0 && (
         <footer className="fixed bottom-0 left-0 right-0 bg-cednetBlue p-2 text-center">
           <button
