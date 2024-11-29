@@ -35,11 +35,14 @@ export default function Comprovante() {
         </section>
 
         <footer className="absolute bottom-0 left-0 right-0 flex">
-          <button className="w-1/2 rounded-bl-lg bg-orange-500 py-3 font-semibold text-white hover:bg-orange-600">
+          <button
+            className="w-1/2 rounded-bl-lg bg-orange-500 py-3 font-semibold text-white hover:bg-orange-600"
+            onClick={() => window.print()} // Função para impressão
+          >
             Imprimir
           </button>
           <button
-            onClick={handlePagarOutra} // Adicionando o evento de clique
+            onClick={handlePagarOutra} // Redireciona para pagar outra
             className="w-1/2 rounded-br-lg bg-blue-800 py-3 font-semibold text-white hover:bg-blue-900"
           >
             Pagar outra
