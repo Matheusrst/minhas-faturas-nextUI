@@ -19,9 +19,9 @@ export function Page() {
   };
 
   return (
-    <div className="mt-4 flex w-[75vw] items-center justify-center xl:w-[65vw]">
+    <div className="mt-6 flex w-[75vw] items-center justify-center xl:w-[65vw]">
       <div className="w-full max-w-4xl rounded-lg bg-cednetWhite p-6 shadow-md">
-        <p className="mb-4 text-lg font-medium text-black">
+        <p className="mb-4 text-[1rem] font-medium text-black">
           Bem vindo,
           <br /> <strong>Luan Vinícius Paiva dos Santos!</strong> 😊
         </p>
