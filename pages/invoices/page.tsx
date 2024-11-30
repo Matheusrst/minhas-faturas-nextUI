@@ -11,7 +11,7 @@ export function Page() {
 
   const handleIconClick = (index: number) => {
     console.log(`Redirecionando para pagamento do item ${index}`);
-    window.location.href = `/pagamento?item=${index}`;
+    window.location.href = `/pagamento`;
   };
 
   const handleGoToPayment = () => {
@@ -19,8 +19,8 @@ export function Page() {
   };
 
   return (
-    <div className="mt-6 flex w-[75vw] items-center justify-center xl:w-[65vw]">
-      <div className="w-full max-w-4xl rounded-lg bg-cednetWhite p-6 shadow-md">
+    <div className="mt-6 flex w-[75vw] items-center justify-center xl:w-[70vw]">
+      <div className="w-full max-w-[70vw] rounded-lg bg-cednetWhite p-6 shadow-md">
         <p className="mb-4 text-[1rem] font-medium text-black">
           Bem vindo,
           <br /> <strong>Luan Vinícius Paiva dos Santos!</strong> 😊

@@ -7,7 +7,7 @@ export function Header() {
   const handleGoToPayment = () => {
     if (selectedItems.length > 0) {
       const itemsQuery = selectedItems.join(",");
-      window.location.href = `/pagamento?items=${itemsQuery}`;
+      window.location.href = `/pagamento`;
     } else {
       alert("Por favor, selecione ao menos um item para prosseguir.");
     }

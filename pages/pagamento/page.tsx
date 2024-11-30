@@ -11,8 +11,8 @@ export function Page() {
 
   return (
     // content
-    <div className="md:mt-4 md:w-[75vw] xl:w-[65vw]">
-      <div className="mx-auto flex max-w-4xl flex-col bg-cednetWhite shadow-lg md:w-[56rem] md:flex-row md:rounded-[.8rem]">
+    <div className="md:w-[75vw] xl:w-[65vw]">
+      <div className="mx-auto flex max-w-4xl flex-col bg-cednetWhite shadow-lg md:mt-4 md:w-[56rem] md:flex-row md:rounded-[.8rem]">
         {/* Coluna da esquerda */}
         <div className="w-full p-6 md:w-3/4">
           <img
