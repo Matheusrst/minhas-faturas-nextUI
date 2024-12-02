@@ -55,7 +55,7 @@ export default function LoginPage() {
     // Adiciona um pequeno intervalo de 1 segundo antes do redirecionamento
     setTimeout(() => {
       router.push("/minhas-faturas"); // Redireciona para a página /minhas-faturas após o login
-    }, 500); // Pequeno atraso antes do redirecionamento
+    }); // Pequeno atraso antes do redirecionamento
 
     setError(""); // Limpa qualquer erro
   };
