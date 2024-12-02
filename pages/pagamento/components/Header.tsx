@@ -10,7 +10,7 @@ const Header = () => {
       <div className="flex items-center space-x-2">
         <button
           className="rounded bg-cednetButton px-4 py-1 text-white hover:bg-cednetButtonHover"
-          onClick={() => (window.location.href = "")}
+          onClick={() => (window.location.href = "/login")}
         >
           Nova Consulta
         </button>
