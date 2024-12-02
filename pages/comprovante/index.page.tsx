@@ -6,7 +6,7 @@ export default function Comprovante() {
 
   // Função para redirecionar para a página principal (index)
   const handlePagarOutra = () => {
-    router.push("/"); // Redireciona para a página principal (index)
+    router.push("/minhas-faturas"); // Redireciona para a página principal (index)
   };
 
   return (

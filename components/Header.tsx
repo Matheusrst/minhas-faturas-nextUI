@@ -21,7 +21,18 @@ export function Header() {
       <div className="flex items-center space-x-2">
         <button
           className="rounded bg-cednetButton px-2 py-1 text-white hover:bg-cednetButtonHover"
-          onClick={() => (window.location.href = "/login")}
+          onClick={() => {
+            // Função para apagar o cookie
+            const deleteCookie = (cookieName: string) => {
+              document.cookie = `${cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Strict`;
+            };
+
+            // Apaga o cookie 'userCpf' antes de redirecionar
+            deleteCookie("userCpf");
+
+            // Redireciona para a página de login
+            window.location.href = "/";
+          }}
         >
           Nova Consulta
         </button>
