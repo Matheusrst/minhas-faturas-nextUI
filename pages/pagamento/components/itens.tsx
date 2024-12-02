@@ -15,7 +15,7 @@ export function ItensDetails() {
           <span className="text-[.7rem] text-black">Juros: R$ 50.00</span>
         </div>
 
-        <div className="flex space-x-36 font-bold sm:space-x-36 md:space-x-20 lg:space-x-[25rem]">
+        <div className="flex space-x-36 font-bold sm:space-x-36 md:space-x-20 lg:space-x-[25.2rem]">
           <span className="text-[.7rem] text-black">Total: R$ 50,00</span>
           <span className="text-[.7rem] text-black">Multa: R$ 50,00</span>
         </div>
