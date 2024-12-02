@@ -1,5 +1,6 @@
 import { ShoppingCart } from "lucide-react";
 import { useSelectedItems } from "@/contexts/SelectedItemsContext";
+import Link from "next/link";
 
 export function Header() {
   const { selectedItems } = useSelectedItems();
@@ -16,7 +17,13 @@ export function Header() {
   return (
     <header className="flex items-center justify-between bg-cednetWhite p-4 shadow-md">
       <div className="flex items-center">
-        <img src="/images/logo-ced-net.png" alt="cednet" className="mr-2 h-8" />
+        <Link href="/minhas-faturas">
+          <img
+            src="/images/logo-ced-net.png"
+            alt="cednet"
+            className="mr-2 h-8 cursor-pointer"
+          />
+        </Link>
       </div>
       <div className="flex items-center space-x-2">
         <button

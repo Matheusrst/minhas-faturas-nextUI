@@ -1,11 +1,18 @@
 import React from "react";
 import { ShoppingCart } from "lucide-react";
+import Link from "next/link";
 
 const Header = () => {
   return (
     <header className="flex h-[4rem] w-full items-center justify-between bg-cednetWhite p-4 shadow-md">
       <div className="flex items-center">
-        <img src="/images/logo-ced-net.png" alt="cednet" className="mr-2 h-8" />
+        <Link href="/minhas-faturas">
+          <img
+            src="/images/logo-ced-net.png"
+            alt="cednet"
+            className="mr-2 h-8 cursor-pointer"
+          />
+        </Link>
       </div>
       <div className="flex items-center space-x-2">
         <button
