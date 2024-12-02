@@ -80,13 +80,13 @@ export function Page() {
       </div>
 
       {selectedItems.length > 0 && (
-        <footer className="fixed bottom-0 left-0 right-0 bg-cednetBlue p-2 text-center">
-          <button
-            className="rounded bg-cednetBlue px-4 py-2 font-semibold text-cednetWhite hover:bg-cednetButtonHover"
-            onClick={handleGoToPayment}
-          >
+        <footer
+          className="fixed bottom-0 left-0 right-0 cursor-pointer bg-cednetBlue p-2 text-center"
+          onClick={handleGoToPayment}
+        >
+          <div className="rounded bg-cednetBlue px-4 py-2 font-semibold text-cednetWhite hover:bg-cednetButtonHover">
             Ir para o Pagamento...
-          </button>
+          </div>
         </footer>
       )}
     </div>

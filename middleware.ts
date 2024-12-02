@@ -2,22 +2,22 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  // Verifica se o cookie 'userCpf' está presente
-  const userCpf = request.cookies.get('userCpf')?.value;
+  // Verifica se o cookie 'authToken' está presente
+  const authToken = request.cookies.get('authToken');
+  
+  console.log('Middleware Executado: ', authToken); // Verifica se está entrando no middleware
 
-  // Se o cookie 'userCpf' não estiver presente, redireciona para a página de login
-  if (!userCpf) {
-    // Verifica se a rota não é a página de login para evitar loop infinito
-    if (request.nextUrl.pathname !== '/login') {
-      return NextResponse.redirect(new URL('/login', request.url));
-    }
+  // Se o cookie 'authToken' não existir, redireciona para o login
+  if (!authToken) {
+    console.log('Cookie não encontrado, redirecionando para login');
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // Continua a navegação se o usuário estiver autenticado ou acessando a página de login
+  // Caso o cookie esteja presente, permite que a requisição prossiga
   return NextResponse.next();
 }
 
-// Especifica as rotas para aplicar o middleware (ajuste conforme necessário)
+// Configuração do matcher para proteger as rotas específicas
 export const config = {
-  matcher: ['/((?!_next|api|LoginPage).*)'],
+  matcher: ['/', '/pagamento', '/comprovante'], // Roteamento protegido
 };

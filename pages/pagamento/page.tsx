@@ -10,11 +10,10 @@ export function Page() {
   };
 
   return (
-    // content
-    <div className="md:w-[75vw] xl:w-[65vw]">
-      <div className="mx-auto flex max-w-4xl flex-col bg-cednetWhite shadow-lg md:mt-4 md:w-[56rem] md:flex-row md:rounded-[.8rem]">
-        {/* Coluna da esquerda */}
-        <div className="w-full p-6 md:w-3/4">
+    <div className="mx-auto w-screen xl:w-[90%]">
+      {/* Aumenta largura horizontal */}
+      <div className="mx-auto flex max-w-6xl flex-col bg-cednetWhite shadow-lg md:mt-24 md:flex-row md:rounded-[.8rem] xl:w-[70rem]">
+        <div className="w-full p-6 xl:w-[85%]">
           <img
             src="/images/logo-ced-net.png"
             alt="Cednet Logo"
@@ -38,10 +37,8 @@ export function Page() {
             R$ 250,00
           </p>
         </div>
-
-        {/* Coluna da direita */}
         <form
-          className="flex w-full flex-col justify-between bg-gray-200 md:w-[30rem] md:rounded-r-[.8rem]"
+          className="flex w-full flex-col justify-between bg-gray-200 md:rounded-r-[.8rem] xl:w-[45%]"
           onSubmit={handlePagarAgora}
         >
           <div className="space-y-4 p-6">
