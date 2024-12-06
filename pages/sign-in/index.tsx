@@ -77,12 +77,66 @@ export function SignIn() {
   }
 
   return (
-    <div className="border border-red-500">
-      <form onSubmit={handleSubmit(handleSignIn)}>
-        <input {...register("document")} />
-        {errorMessage && <p>{errorMessage}</p>}
-        <button type="submit">logar</button>
-      </form>
+    <div
+      className="flex h-screen items-center justify-center bg-cover bg-fixed bg-center"
+      style={{
+        backgroundImage: `url(/images/BG-Faturas.png)`,
+      }}
+    >
+      <div className="flex w-11/12 max-w-full flex-col overflow-hidden rounded-md border-2 border-blue-500 border-opacity-50 shadow-md lg:flex-row">
+        {/* Form Section */}
+        <div className="flex flex-1 flex-col items-center justify-center p-8">
+          <form
+            onSubmit={handleSubmit(handleSignIn)}
+            className="flex w-full max-w-md flex-col gap-6"
+          >
+            <div className="text-center">
+              <img
+                src={`images/logo.png`}
+                alt="Logo"
+                className="mx-auto mb-4 w-56"
+              />
+              <h1 className="text-3xl font-bold uppercase text-white">
+                Minhas Faturas
+              </h1>
+            </div>
+            {errorMessage && (
+              <p className="text-center font-medium text-red-500">
+                {errorMessage}
+              </p>
+            )}
+            <input
+              type="text"
+              {...register("document")}
+              placeholder="Seu CPF ou CNPJ"
+              className="w-full rounded-md border-2 border-cednetWhite bg-blue-700 bg-opacity-[40%] px-4 py-3 text-center text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white"
+            />
+            <button
+              type="submit"
+              className="w-full rounded-md border-2 border-cednetWhite bg-blue-600 bg-opacity-[10%] py-3 text-xl font-semibold text-white hover:bg-blue-700"
+            >
+              Carregar faturas
+            </button>
+            {/* <div className="mt-4 text-center">
+              <a
+                href="/minhas-faturas"
+                className="text-sm text-gray-400 hover:underline"
+              >
+                Termos de uso
+              </a>
+            </div> */}
+          </form>
+        </div>
+
+        {/* Banner Section */}
+        <div className="w-full lg:w-1/2">
+          <img
+            src={`images/Minhas-Faturas-Grupo-CEDNET.png`}
+            alt="Banner"
+            className="h-full w-full object-cover"
+          />
+        </div>
+      </div>
     </div>
   );
 }
