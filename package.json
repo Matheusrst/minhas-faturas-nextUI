@@ -10,6 +10,7 @@
 	},
 	"dependencies": {
 		"@fontsource/montserrat": "^5.1.0",
+		"@hookform/resolvers": "^3.9.1",
 		"@nextui-org/button": "2.0.38",
 		"@nextui-org/code": "2.0.33",
 		"@nextui-org/input": "2.2.5",
@@ -23,7 +24,11 @@
 		"@nextui-org/system": "2.2.6",
 		"@nextui-org/theme": "2.2.11",
 		"@react-aria/visually-hidden": "3.8.12",
+		"@tanstack/react-query": "^5.62.2",
+		"axios": "^1.7.9",
 		"clsx": "2.1.1",
+		"cookie": "^1.0.2",
+		"cookies": "^0.9.1",
 		"framer-motion": "~11.1.1",
 		"intl-messageformat": "^10.5.0",
 		"js-cookie": "^3.0.5",
@@ -31,8 +36,11 @@
 		"lucide-react": "^0.460.0",
 		"next": "14.2.4",
 		"next-themes": "^0.2.1",
+		"nookies": "^2.5.2",
 		"react": "18.3.1",
-		"react-dom": "18.3.1"
+		"react-dom": "18.3.1",
+		"react-hook-form": "^7.53.2",
+		"zod": "^3.23.8"
 	},
 	"devDependencies": {
 		"@types/js-cookie": "^3.0.6",

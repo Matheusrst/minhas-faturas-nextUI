@@ -1,21 +1,79 @@
-import { useSelectedItems } from "@/contexts/SelectedItemsContext"; // Certifique-se que o caminho está correto
-import { Barcode, CreditCard, QrCode } from "lucide-react";
+import { nextApi } from "@/services/next-api";
+import { useQuery } from "@tanstack/react-query";
+import { AxiosError } from "axios";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { TableRow } from "./table-row";
+import Link from "next/link";
+import { useSelectedItems } from "@/contexts/SelectedItemsContext";
 
 export function Page() {
-  const { selectedItems, toggleItem, selectAllItems, clearAllItems } =
-    useSelectedItems();
+  const router = useRouter();
+  const { selectedItems, selectAllItems, clearAllItems } = useSelectedItems();
 
-  const handleCheckboxChange = (index: number) => {
-    toggleItem(index);
-  };
+  const [params, setParams] = useState<FiltersProps>(() => ({
+    fields: "id,valor,data_vencimento,status",
+    paginate: 20,
+    order_by: "fn_areceber.data_vencimento",
+    order: "desc",
+    filters: [],
+  }));
 
-  const handleIconClick = (index: number) => {
-    console.log(`Redirecionando para pagamento do item ${index}`);
-    window.location.href = `/pagamento`;
-  };
+  const { data: invoices } = useQuery({
+    queryKey: ["invoices", params, router.query],
+    queryFn: async () => {
+      try {
+        const response = await nextApi.post<
+          ActionsResponse<ApiResponse<InvoiceInterface[]>>
+        >(`/invoices`, params);
 
-  const handleGoToPayment = () => {
-    window.location.href = "/pagamento";
+        if (response.status === 200) {
+          return response.data;
+        }
+
+        return null;
+      } catch (error) {
+        console.log(error);
+
+        if (error instanceof AxiosError && error.response) {
+          const data = error.response.data as ActionsResponse<[]>;
+          return null;
+        }
+
+        if (error instanceof Error) {
+          return null;
+        }
+
+        return null;
+      }
+    },
+  });
+
+  useEffect(() => {
+    if (router.query.paginate) {
+      setParams((state) => ({
+        ...state,
+        paginate: router.query.paginate as string,
+      }));
+    } else {
+      setParams((state) => ({
+        ...state,
+        paginate: 20,
+      }));
+    }
+  }, [router.query]);
+
+  if (!invoices) {
+    return invoices;
+  }
+
+  const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      const allIds = invoices.data.data.map((invoice) => invoice.id);
+      selectAllItems(allIds);
+    } else {
+      clearAllItems();
+    }
   };
 
   return (
@@ -25,20 +83,19 @@ export function Page() {
           Bem vindo,
           <br /> <strong>Luan Vinícius Paiva dos Santos!</strong> 😊
         </p>
-        <div className="overflow-x-auto">
+        <div className="scrollbar-custom max-h-[70vh] overflow-x-auto">
           <table className="w-full border-collapse">
             <thead className="bg-cednetGray">
               <tr>
                 <th className="border p-2 text-left text-black">
                   <input
                     type="checkbox"
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        selectAllItems();
-                      } else {
-                        clearAllItems(); // Chama a função para limpar todos os itens
-                      }
-                    }}
+                    className="h-4 w-4"
+                    onChange={handleSelectAll}
+                    checked={
+                      invoices.data.data.length > 0 &&
+                      selectedItems.length === invoices.data.data.length
+                    }
                   />
                 </th>
                 <th className="p-2 text-left text-black">Código</th>
@@ -47,47 +104,23 @@ export function Page() {
                 <th className="p-2 text-center text-black">Ações</th>
               </tr>
             </thead>
+
             <tbody>
-              {Array(7)
-                .fill(null)
-                .map((_, index) => (
-                  <tr key={index} className="hover:bg-cednetGray/30">
-                    <td className="p-2 text-left text-black">
-                      <input
-                        type="checkbox"
-                        checked={selectedItems.includes(index)}
-                        onChange={() => handleCheckboxChange(index)}
-                      />
-                    </td>
-                    <td className="p-2 text-black">1288279</td>
-                    <td className="p-2 text-black">10/11/2024</td>
-                    <td className="p-2 text-black">R$ 19,95</td>
-                    <td className="p-2 text-center text-black">
-                      <div className="flex items-center justify-center space-x-2">
-                        <Barcode className="h-5 w-5 text-cednetIcons" />
-                        <CreditCard
-                          className="h-5 w-5 cursor-pointer text-cednetIcons"
-                          onClick={() => handleIconClick(index)}
-                        />
-                        <QrCode className="h-5 w-5 text-cednetIcons" />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+              {invoices.data.data.map((invoice, index) => (
+                <TableRow key={index} invoice={invoice} />
+              ))}
             </tbody>
           </table>
         </div>
       </div>
 
       {selectedItems.length > 0 && (
-        <footer
-          className="fixed bottom-0 left-0 right-0 cursor-pointer bg-cednetBlue p-2 text-center"
-          onClick={handleGoToPayment}
+        <Link
+          href={"/pagamento"}
+          className="fixed bottom-0 left-0 right-0 cursor-pointer rounded-none bg-cednetBlue px-4 py-4 text-center font-semibold text-cednetWhite hover:bg-cednetButtonHover"
         >
-          <div className="rounded bg-cednetBlue px-4 py-2 font-semibold text-cednetWhite hover:bg-cednetButtonHover">
-            Ir para o Pagamento...
-          </div>
-        </footer>
+          Ir para o Pagamento...
+        </Link>
       )}
     </div>
   );

@@ -35,7 +35,7 @@ export function Header() {
             };
 
             // Apaga o cookie 'userCpf' antes de redirecionar
-            deleteCookie("userCpf");
+            deleteCookie("my_invoices");
 
             // Redireciona para a página de login
             window.location.href = "/";

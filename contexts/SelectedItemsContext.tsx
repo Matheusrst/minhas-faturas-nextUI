@@ -1,17 +1,20 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 
-// Definir o contexto e o tipo do estado
+// Tipo para os dados do contexto
 interface SelectedItemsContextType {
   selectedItems: number[];
-  toggleItem: (index: number) => void;
-  selectAllItems: () => void;
+  toggleItem: (id: number) => void;
+  isItemSelected: (id: number) => boolean;
+  selectAllItems: (ids: number[]) => void;
   clearAllItems: () => void;
 }
 
+// Criar o contexto
 const SelectedItemsContext = createContext<
   SelectedItemsContextType | undefined
 >(undefined);
 
+// Hook para usar o contexto
 export const useSelectedItems = () => {
   const context = useContext(SelectedItemsContext);
   if (!context) {
@@ -22,6 +25,7 @@ export const useSelectedItems = () => {
   return context;
 };
 
+// Provedor do contexto
 export const SelectedItemsProvider = ({
   children,
 }: {
@@ -29,25 +33,37 @@ export const SelectedItemsProvider = ({
 }) => {
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
 
-  const toggleItem = (index: number) => {
+  // Alternar seleção de um item
+  const toggleItem = (id: number) => {
     setSelectedItems((prev) =>
-      prev.includes(index)
-        ? prev.filter((item) => item !== index)
-        : [...prev, index],
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
     );
   };
 
-  const selectAllItems = () => {
-    setSelectedItems(Array.from({ length: 7 }, (_, i) => i)); // Ou o número de itens que você tem
+  // Verificar se um item está selecionado
+  const isItemSelected = (id: number) => {
+    return selectedItems.includes(id);
   };
 
+  // Selecionar todos os itens
+  const selectAllItems = (ids: number[]) => {
+    setSelectedItems(ids);
+  };
+
+  // Limpar todas as seleções
   const clearAllItems = () => {
     setSelectedItems([]);
   };
 
   return (
     <SelectedItemsContext.Provider
-      value={{ selectedItems, toggleItem, selectAllItems, clearAllItems }}
+      value={{
+        selectedItems,
+        toggleItem,
+        isItemSelected,
+        selectAllItems,
+        clearAllItems,
+      }}
     >
       {children}
     </SelectedItemsContext.Provider>
