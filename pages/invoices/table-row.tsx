@@ -26,7 +26,7 @@ export function TableRow({ invoice }: TableRowProps) {
       </td>
       <td className="whitespace-nowrap p-2 text-black">{invoice.id}</td>
       <td className="whitespace-nowrap p-2 text-black">
-        {invoice.data_vencimento}
+        {new Date(invoice.data_vencimento).toLocaleDateString("pt-BR")}
       </td>
       <td className="whitespace-nowrap p-2 text-black">R$ {invoice.valor}</td>
       <td className="whitespace-nowrap p-2 text-center text-black">
