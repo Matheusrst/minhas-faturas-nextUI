@@ -1,14 +1,19 @@
 import { ShoppingCart } from "lucide-react";
 import { useSelectedItems } from "@/contexts/SelectedItemsContext";
 import Link from "next/link";
+import nookies from "nookies";
 
 export function Header() {
   const { selectedItems } = useSelectedItems();
 
   const handleGoToPayment = () => {
     if (selectedItems.length > 0) {
-      const itemsQuery = selectedItems.join(",");
-      window.location.href = `/pagamento`;
+      nookies.set(null, "payment_invoices", JSON.stringify(selectedItems), {
+        path: "/",
+      });
+
+      // Redirecionar o usuário para a página de pagamento
+      window.location.href = "/pagamento";
     } else {
       alert("Por favor, selecione ao menos um item para prosseguir.");
     }
@@ -29,15 +34,10 @@ export function Header() {
         <button
           className="rounded bg-cednetButton px-2 py-1 text-white hover:bg-cednetButtonHover"
           onClick={() => {
-            // Função para apagar o cookie
             const deleteCookie = (cookieName: string) => {
               document.cookie = `${cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Strict`;
             };
-
-            // Apaga o cookie 'userCpf' antes de redirecionar
             deleteCookie("my_invoices");
-
-            // Redireciona para a página de login
             window.location.href = "/";
           }}
         >
@@ -46,7 +46,7 @@ export function Header() {
         <div className="relative">
           <button
             className="flex h-8 w-8 items-center justify-center rounded bg-blue-800 hover:bg-blue-900"
-            onClick={handleGoToPayment} // Use a função handleGoToPayment
+            onClick={handleGoToPayment}
           >
             <ShoppingCart className="h-5 w-5 text-white" />
           </button>

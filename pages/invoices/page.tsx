@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { TableRow } from "./table-row";
 import Link from "next/link";
+import nookies from "nookies";
 import { useSelectedItems } from "@/contexts/SelectedItemsContext";
 
 export function Page() {
@@ -76,6 +77,19 @@ export function Page() {
     }
   };
 
+  const handleGoToPayment = () => {
+    if (selectedItems.length > 0) {
+      nookies.set(null, "payment_invoices", JSON.stringify(selectedItems), {
+        path: "/",
+      });
+
+      // Redirecionar para a página de pagamento
+      window.location.href = "/pagamento";
+    } else {
+      alert("Por favor, selecione ao menos um item para prosseguir.");
+    }
+  };
+
   return (
     <div className="mt-6 flex w-[75vw] items-center justify-center xl:w-[70vw]">
       <div className="w-full max-w-[70vw] rounded-lg bg-cednetWhite p-6 shadow-md">
@@ -115,12 +129,12 @@ export function Page() {
       </div>
 
       {selectedItems.length > 0 && (
-        <Link
-          href={"/pagamento"}
+        <button
+          onClick={handleGoToPayment} // ✅ Salva no cookie e redireciona
           className="fixed bottom-0 left-0 right-0 cursor-pointer rounded-none bg-cednetBlue px-4 py-4 text-center font-semibold text-cednetWhite hover:bg-cednetButtonHover"
         >
           Ir para o Pagamento...
-        </Link>
+        </button>
       )}
     </div>
   );

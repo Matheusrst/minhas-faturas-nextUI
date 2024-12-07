@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { Barcode, CreditCard, QrCode } from "lucide-react";
 import { useSelectedItems } from "@/contexts/SelectedItemsContext";
+import nookies from "nookies";
 
 interface TableRowProps {
   invoice: InvoiceInterface;
@@ -11,6 +12,9 @@ export function TableRow({ invoice }: TableRowProps) {
   const { toggleItem, isItemSelected } = useSelectedItems();
 
   const handleIconClick = (id: number) => {
+    nookies.set(null, "payment_invoices", JSON.stringify([id]), {
+      path: "/",
+    });
     router.push("/pagamento");
   };
 
