@@ -153,7 +153,7 @@ export function Page() {
             </div>
             <div>
               <select
-                className="w-full rounded border border-gray-300 bg-cednetWhite p-3 text-sm text-black text-cednetBlack"
+                className="text-smk w-full rounded border border-gray-300 bg-cednetWhite p-3 text-cednetBlack"
                 value={formData.installments}
                 onChange={(e) =>
                   setFormData({
