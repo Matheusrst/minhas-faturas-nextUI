@@ -23,7 +23,7 @@ export function Page() {
     e.preventDefault();
 
     const cookies = nookies.get(null);
-    const invoiceIds = JSON.parse(cookies.payment_invoices || "[]"); // Pode ser que seja o mesmo cookie utilizado no "ItensDetails"
+    const invoiceIds = JSON.parse(cookies.payment_invoices || "[]");
 
     if (invoiceIds.length === 0) {
       alert("Nenhuma fatura foi selecionada.");
@@ -32,7 +32,7 @@ export function Page() {
 
     // Preparando os dados para a requisição
     const paymentData = {
-      invoices: invoiceIds, // Agora o array de invoices está preenchido com os IDs das faturas
+      invoices: invoiceIds,
       card_number_mask: formData.cardNumber,
       titular_name: formData.titularName,
       titular_document: formData.titularDocument,

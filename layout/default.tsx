@@ -1,4 +1,4 @@
-import { Header } from "../components/Header";
+import { Header } from "@/pages/minhas-faturas/components/Header";
 import { ReactNode } from "react";
 
 export function LayoutDefalt({ children }: { children: ReactNode }) {
