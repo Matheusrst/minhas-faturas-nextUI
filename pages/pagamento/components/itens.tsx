@@ -18,10 +18,16 @@ interface Contract {
   contrato: string;
 }
 
-export function ItensDetails() {
-  const [invoices, setInvoices] = useState<InvoiceDetails[]>([]); // 🟢 Estado inicial como array vazio
-  const [error, setError] = useState<string | null>(null); // 🟢 Mensagem de erro
+interface ItensDetailsProps {
+  onTotalChange?: (total: number) => void;
+}
 
+export function ItensDetails({ onTotalChange }: ItensDetailsProps) {
+  const [invoices, setInvoices] = useState<InvoiceDetails[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true); // Adiciona o estado de "carregando"
+
+  // ✅ Sempre chame o hook useEffect fora de qualquer condição
   useEffect(() => {
     const loadInvoices = async () => {
       try {
@@ -35,15 +41,14 @@ export function ItensDetails() {
         console.log("📢 Enviando IDs para API: ", invoiceIds);
 
         const response = await nextApi.post("/calculate", {
-          invoices: invoiceIds, // ✅ Enviando os IDs das faturas
+          invoices: invoiceIds,
         });
 
-        console.log("🚀 Resposta da API: ", response.data); // ✅ Verifica o formato da resposta da API
+        console.log("🚀 Resposta da API: ", response.data);
 
         const { withContracts, contracts } = response.data.data;
 
         if (Array.isArray(withContracts) && withContracts.length > 0) {
-          // 🟢 Faz a relação entre as faturas (withContracts) e os contratos
           const invoicesWithContracts = withContracts.map((invoice) => {
             const contract = contracts.find(
               (contract) => contract.id === invoice.id_contrato,
@@ -57,7 +62,7 @@ export function ItensDetails() {
             };
           });
 
-          setInvoices(invoicesWithContracts); // 🟢 Define o estado de invoices
+          setInvoices(invoicesWithContracts);
         } else {
           console.error("Formato de resposta inesperado", response.data);
           throw new Error("Erro ao carregar as faturas.");
@@ -72,53 +77,66 @@ export function ItensDetails() {
         } else {
           setError("Erro desconhecido.");
         }
+      } finally {
+        setLoading(false);
       }
     };
 
     loadInvoices();
   }, []);
 
-  if (error) {
-    return <p className="text-red-500">{error}</p>;
-  }
+  // 🔥 Cálculo da soma total 🔥
+  const totalSum = invoices.reduce((acc, invoice) => {
+    const total = parseFloat(invoice.value_total.replace(",", "."));
+    return acc + (isNaN(total) ? 0 : total);
+  }, 0);
 
-  if (invoices.length === 0) {
-    return <p>Carregando faturas...</p>;
-  }
+  useEffect(() => {
+    if (onTotalChange) {
+      onTotalChange(totalSum);
+    }
+  }, [totalSum, onTotalChange]);
 
+  // ✅ Agora, a lógica de renderização é controlada por "loading" e "error"
   return (
     <div className="space-y-4">
-      {invoices.map((invoice) => (
-        <div
-          key={invoice.invoice_id}
-          className="flex items-start space-x-4 rounded-lg bg-cednetGray p-4"
-        >
-          <Globe className="h-6 w-6 text-black" />
-          <div>
-            <p className="text-xs font-medium text-black">
-              <strong>Contrato:</strong> {invoice.contrato}
-            </p>
+      {loading && <p>Carregando faturas...</p>}
 
-            <div className="flex space-x-36 font-bold sm:space-x-36 md:space-x-20 lg:space-x-[25rem]">
-              <span className="text-[.7rem] text-black">
-                Valor: R$ {invoice.valor}
-              </span>
-              <span className="text-[.7rem] text-black">
-                Juros: R$ {invoice.fees}
-              </span>
-            </div>
+      {error && <p className="text-red-500">{error}</p>}
 
-            <div className="flex space-x-36 font-bold sm:space-x-36 md:space-x-20 lg:space-x-[25.2rem]">
-              <span className="text-[.7rem] text-black">
-                Total: R$ {invoice.value_total}
-              </span>
-              <span className="text-[.7rem] text-black">
-                Multa: R$ {invoice.penalty}
-              </span>
+      {!loading &&
+        !error &&
+        invoices.map((invoice) => (
+          <div
+            key={invoice.invoice_id}
+            className="flex items-start space-x-4 rounded-lg bg-cednetGray p-4"
+          >
+            <Globe className="h-6 w-6 text-black" />
+            <div>
+              <p className="text-xs font-medium text-black">
+                <strong>Contrato:</strong> {invoice.contrato}
+              </p>
+
+              <div className="flex space-x-36 font-bold sm:space-x-36 md:space-x-20 lg:space-x-[25rem]">
+                <span className="text-[.7rem] text-black">
+                  Valor: R$ {invoice.valor}
+                </span>
+                <span className="text-[.7rem] text-black">
+                  Juros: R$ {invoice.fees}
+                </span>
+              </div>
+
+              <div className="flex space-x-36 font-bold sm:space-x-36 md:space-x-20 lg:space-x-[25.2rem]">
+                <span className="text-[.7rem] text-black">
+                  Total: R$ {invoice.value_total}
+                </span>
+                <span className="text-[.7rem] text-black">
+                  Multa: R$ {invoice.penalty}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
-      ))}
+        ))}
     </div>
   );
 }

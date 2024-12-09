@@ -1,8 +1,10 @@
 import { useRouter } from "next/router";
 import { ItensDetails } from "../pagamento/components/itens";
+import { useState } from "react";
 
 export function Page() {
   const router = useRouter();
+  const [totalAmount, setTotalAmount] = useState<number>(0);
 
   const handlePagarAgora = (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,12 +25,11 @@ export function Page() {
             Todos os Itens
           </h2>
           <div className="scrollbar-custom h-[24rem] space-y-4 overflow-y-auto">
-            {/* Lista de itens */}
-            <ItensDetails />
+            <ItensDetails onTotalChange={(total) => setTotalAmount(total)} />
           </div>
-          {/* calculo do valor total a ser pago */}
+          {/* Exibição do valor total */}
           <p className="mt-6 text-left text-lg font-bold text-black">
-            R$ 250,00
+            R$ {totalAmount.toFixed(2).replace(".", ",")}
           </p>
         </div>
         <form
