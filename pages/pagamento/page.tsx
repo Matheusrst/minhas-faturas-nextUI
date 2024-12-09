@@ -25,14 +25,8 @@ export function Page() {
           <div className="scrollbar-custom h-[24rem] space-y-4 overflow-y-auto">
             {/* Lista de itens */}
             <ItensDetails />
-            <ItensDetails />
-            <ItensDetails />
-            <ItensDetails />
-            <ItensDetails />
-            <ItensDetails />
-            <ItensDetails />
-            <ItensDetails />
           </div>
+          {/* calculo do valor total a ser pago */}
           <p className="mt-6 text-left text-lg font-bold text-black">
             R$ 250,00
           </p>

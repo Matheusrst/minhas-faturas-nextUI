@@ -16,7 +16,7 @@ export function Page() {
     fields: "id,valor,data_vencimento,status",
     paginate: 20,
     order_by: "fn_areceber.data_vencimento",
-    order: "asc", //ou desc
+    order: "desc", //ou asc
     filters: [],
   }));
 

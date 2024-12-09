@@ -6,12 +6,10 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 const handler = async function (req: NextApiRequest, res: NextApiResponse) {
     try {
-        //verifica se o método HTTP é post 
         if (req.method === 'POST') {
             const body = req.body;
 
-            //chamada à API de calculo de multas e juros
-            const response = await integration.post(`/my/invoices/web/calculate`, body, {
+            const response = await integration.post(`/my-invoices/web/invoices/calculate`, body, {
                 headers:{
                     "App-Secret": req.app_token,
                     "my-invoices": req.session_token
