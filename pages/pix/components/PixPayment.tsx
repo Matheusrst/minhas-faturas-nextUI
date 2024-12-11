@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { QrCode, CopySlash, CheckCircle } from "lucide-react";
 import { nextApi } from "@/services/next-api";
-import nookies from "nookies";
+import nookies from "nookies"; // Importar nookies para recuperar o ID da fatura
 
 interface PixData {
   qrCode: string;
@@ -40,8 +40,6 @@ export function PixPayment() {
       const cookies = nookies.get(null);
       const invoiceIds = JSON.parse(cookies.payment_invoices || "[]");
 
-      console.log("invoiceIds:", invoiceIds); // Verifique se o ID está sendo capturado corretamente.
-
       if (invoiceIds.length === 0) {
         console.error("ID de fatura não encontrado.");
         return;
@@ -50,7 +48,7 @@ export function PixPayment() {
       const response = await nextApi.post("/pix", { id: invoiceIds[0] });
 
       if (response.status === 200 && response.data) {
-        setPixData(response.data.data);
+        setPixData(response.data.data); // Atualiza os dados do PIX
       } else {
         console.error("Erro ao buscar os dados do PIX");
       }
@@ -72,8 +70,23 @@ export function PixPayment() {
   // Função para abrir o modal e iniciar o resgate dos dados
   const handleOpen = () => {
     setOpen(true);
-    fetchPixData();
+    setPixData(null); // Limpa os dados do PIX ao abrir o modal
+    fetchPixData(); // Chama a função de busca assim que o modal abre
   };
+
+  // Fechar o modal, limpar os dados do PIX e deletar o cookie
+  const handleClose = () => {
+    setOpen(false);
+    setPixData(null); // Limpa os dados do PIX quando fechar o modal
+    nookies.destroy(null, "payment_invoices", { path: "/minhas-faturas" }); // Deleta o cookie ao fechar o modal
+  };
+
+  // Usando useEffect para garantir que o cookie seja lido assim que o modal é aberto
+  useEffect(() => {
+    if (open) {
+      fetchPixData(); // Garantir que a função de buscar os dados seja chamada quando o modal abrir
+    }
+  }, [open]);
 
   return (
     <div>
@@ -85,7 +98,7 @@ export function PixPayment() {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="relative w-96 rounded-lg bg-white p-6 shadow-lg">
             <button
-              onClick={() => setOpen(false)}
+              onClick={handleClose} // Fecha o modal e deleta o cookie
               className="absolute right-2 top-2 text-gray-500 hover:text-gray-700"
             >
               ×
