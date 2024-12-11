@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import { Barcode, CreditCard, QrCode } from "lucide-react";
 import { useSelectedItems } from "@/contexts/SelectedItemsContext";
 import nookies from "nookies";
+import { PixPayment } from "@/components/PixPayment";
 
 interface TableRowProps {
   invoice: InvoiceInterface;
@@ -40,7 +41,9 @@ export function TableRow({ invoice }: TableRowProps) {
             className="h-5 w-5 cursor-pointer text-cednetIcons"
             onClick={() => handleIconClick(invoice.id)}
           />
-          <QrCode className="h-5 w-5 text-cednetIcons" />
+          <div className="h-5 w-5 text-cednetIcons">
+            <PixPayment />
+          </div>
         </div>
       </td>
     </tr>
