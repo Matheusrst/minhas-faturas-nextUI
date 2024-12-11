@@ -47,8 +47,9 @@ export function Page() {
       const response = await nextApi.post("/payment", paymentData);
 
       if (response.status === 200) {
-        // Se a resposta for bem-sucedida, redireciona para o comprovante
-        router.push("/comprovante");
+        // Se a resposta for bem-sucedida, redireciona para o comprovante passando o ID do comprovante
+        const receiptId = response.data.data.id;
+        router.push(`/comprovante/${receiptId}`);
       } else {
         // Se algo deu errado, exibe uma mensagem de erro
         alert("Erro no pagamento. Tente novamente.");

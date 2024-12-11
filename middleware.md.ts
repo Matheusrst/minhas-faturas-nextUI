@@ -39,5 +39,5 @@ export function middleware(request: NextRequest) {
 
 // Configuração do matcher para proteger as rotas específicas
 export const config = {
-  matcher: ['/minhas-faturas', '/pagamento', '/comprovante'], // Roteamento protegido
+  matcher: ['/minhas-faturas/:path*', '/pagamento/:path*', '/comprovante/:path*'], // Roteamento protegido
 };
