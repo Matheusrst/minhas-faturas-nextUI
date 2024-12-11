@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { Barcode, CreditCard, QrCode } from "lucide-react";
 import { useSelectedItems } from "@/contexts/SelectedItemsContext";
 import nookies from "nookies";
-import { PixPayment } from "@/components/PixPayment";
+import { PixPayment } from "../pix/components/PixPayment";
 
 interface TableRowProps {
   invoice: InvoiceInterface;
@@ -17,6 +17,12 @@ export function TableRow({ invoice }: TableRowProps) {
       path: "/",
     });
     router.push("/pagamento");
+  };
+
+  const handlePixClick = (id: number) => {
+    nookies.set(null, "payment_invoices", JSON.stringify([id]), {
+      path: "/",
+    });
   };
 
   return (
@@ -41,7 +47,10 @@ export function TableRow({ invoice }: TableRowProps) {
             className="h-5 w-5 cursor-pointer text-cednetIcons"
             onClick={() => handleIconClick(invoice.id)}
           />
-          <div className="h-5 w-5 text-cednetIcons">
+          <div
+            className="h-5 w-5 text-cednetIcons"
+            onClick={() => handlePixClick(invoice.id)}
+          >
             <PixPayment />
           </div>
         </div>

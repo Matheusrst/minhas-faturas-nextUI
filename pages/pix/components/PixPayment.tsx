@@ -1,25 +1,83 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { QrCode, CopySlash, CheckCircle } from "lucide-react";
+import { nextApi } from "@/services/next-api";
+import nookies from "nookies";
+
+interface PixData {
+  qrCode: string;
+  imagemSrc: string;
+  expiracaoPix: string;
+  solicitacaoPagador: string;
+  valor: {
+    original: string;
+    abatimento: any[];
+    desconto: any[];
+    juros: {
+      valorPerc: string;
+      modalidade: number;
+    };
+    multa: {
+      valorPerc: string;
+      modalidade: number;
+    };
+  };
+  devedor: string;
+  pixCopiaECola: string;
+  dataDeVencimento: string;
+}
 
 export function PixPayment() {
   const [open, setOpen] = useState(false);
   const [isPaid, setIsPaid] = useState(false);
-  const [pixData, setPixData] = useState({
-    qrCodeImage: "",
-    pixCode: "0002012633B14C...",
-    dueDate: "10/12/2024",
-    amount: "R$ 100,00",
-    total: "R$ 100,00",
-  });
+  const [loading, setLoading] = useState(false);
+  const [pixData, setPixData] = useState<PixData | null>(null);
 
+  // Função para buscar os dados do PIX
+  const fetchPixData = async () => {
+    setLoading(true);
+    try {
+      // Lê o ID da fatura do cookie
+      const cookies = nookies.get(null);
+      const invoiceIds = JSON.parse(cookies.payment_invoices || "[]");
+
+      console.log("invoiceIds:", invoiceIds); // Verifique se o ID está sendo capturado corretamente.
+
+      if (invoiceIds.length === 0) {
+        console.error("ID de fatura não encontrado.");
+        return;
+      }
+
+      const response = await nextApi.post("/pix", { id: invoiceIds[0] });
+
+      if (response.status === 200 && response.data) {
+        setPixData(response.data.data);
+      } else {
+        console.error("Erro ao buscar os dados do PIX");
+      }
+    } catch (error) {
+      console.error("Erro ao buscar os dados do PIX", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Função para copiar o código PIX Copia e Cola
   const handleCopy = () => {
-    navigator.clipboard.writeText(pixData.pixCode);
-    alert("Código PIX copiado com sucesso!");
+    if (pixData?.pixCopiaECola) {
+      navigator.clipboard.writeText(pixData.pixCopiaECola);
+      alert("Código PIX copiado com sucesso!");
+    }
+  };
+
+  // Função para abrir o modal e iniciar o resgate dos dados
+  const handleOpen = () => {
+    setOpen(true);
+    fetchPixData();
   };
 
   return (
     <div>
-      <button onClick={() => setOpen(true)}>
+      <button onClick={handleOpen}>
         <QrCode className="h-5 w-5 text-cednetIcons" />
       </button>
 
@@ -33,7 +91,9 @@ export function PixPayment() {
               ×
             </button>
 
-            {!isPaid ? (
+            {loading ? (
+              <p className="text-center">Carregando dados do PIX...</p>
+            ) : pixData ? (
               <>
                 <h2 className="mb-4 text-center text-lg font-bold text-gray-800">
                   Pagamento via PIX
@@ -41,7 +101,7 @@ export function PixPayment() {
 
                 <div className="flex justify-center">
                   <img
-                    src={pixData.qrCodeImage || "/images/placeholder-qr.png"}
+                    src={pixData.imagemSrc}
                     alt="QR Code"
                     className="h-40 w-40 rounded-md"
                   />
@@ -55,7 +115,7 @@ export function PixPayment() {
                     <input
                       type="text"
                       readOnly
-                      value={pixData.pixCode}
+                      value={pixData.pixCopiaECola}
                       className="w-full rounded-l-md border border-gray-300 bg-gray-100 px-3 py-2 text-sm text-gray-600"
                     />
                     <button
@@ -70,15 +130,15 @@ export function PixPayment() {
                 <div className="mt-6 space-y-2">
                   <div className="flex justify-between text-sm text-gray-600">
                     <span>Data de Vencimento:</span>
-                    <span>{pixData.dueDate}</span>
+                    <span>{pixData.dataDeVencimento}</span>
                   </div>
                   <div className="flex justify-between text-sm text-gray-600">
                     <span>Valor:</span>
-                    <span>{pixData.amount}</span>
+                    <span>R$ {pixData.valor.original}</span>
                   </div>
                   <div className="flex justify-between text-sm font-bold text-gray-800">
                     <span>Total:</span>
-                    <span>{pixData.total}</span>
+                    <span>R$ {pixData.valor.original}</span>
                   </div>
                 </div>
 
@@ -92,21 +152,9 @@ export function PixPayment() {
                 </div>
               </>
             ) : (
-              <div className="flex flex-col items-center">
-                <CheckCircle size={80} className="text-green-600" />
-                <h2 className="mt-4 text-lg font-bold text-gray-800">
-                  Pagamento Confirmado!
-                </h2>
-                <p className="mt-2 text-sm text-gray-600">
-                  O pagamento foi concluído com sucesso.
-                </p>
-                <button
-                  onClick={() => setOpen(false)}
-                  className="mt-4 rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-                >
-                  Fechar
-                </button>
-              </div>
+              <p className="text-center text-red-500">
+                Erro ao carregar os dados do PIX
+              </p>
             )}
           </div>
         </div>
