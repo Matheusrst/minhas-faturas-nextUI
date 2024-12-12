@@ -91,7 +91,7 @@ export function Page() {
   };
 
   return (
-    <div className="mt-6 flex w-[75vw] items-center justify-center xl:w-[70vw]">
+    <div className="mt-6 flex w-[85vw] items-center justify-center xl:w-[80vw]">
       <div className="w-full max-w-[70vw] rounded-lg bg-cednetWhite p-6 shadow-md">
         <p className="mb-4 text-[1rem] font-medium text-black">
           Bem vindo,

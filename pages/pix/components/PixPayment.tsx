@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { QrCode, CopySlash, CheckCircle } from "lucide-react";
 import { nextApi } from "@/services/next-api";
-import nookies from "nookies"; // Importar nookies para recuperar o ID da fatura
+import nookies from "nookies";
 
 interface PixData {
   qrCode: string;
@@ -28,20 +28,22 @@ interface PixData {
 
 export function PixPayment() {
   const [open, setOpen] = useState(false);
-  const [isPaid, setIsPaid] = useState(false);
   const [loading, setLoading] = useState(false);
   const [pixData, setPixData] = useState<PixData | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [paymentConfirmed, setPaymentConfirmed] = useState(false);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Função para buscar os dados do PIX
+  // 🔥 **Função para buscar os dados do PIX**
   const fetchPixData = async () => {
     setLoading(true);
+    setError(null); // Limpa qualquer erro anterior
     try {
-      // Lê o ID da fatura do cookie
       const cookies = nookies.get(null);
       const invoiceIds = JSON.parse(cookies.payment_invoices || "[]");
 
       if (invoiceIds.length === 0) {
-        console.error("ID de fatura não encontrado.");
+        setError("ID de fatura não encontrado.");
         return;
       }
 
@@ -50,16 +52,52 @@ export function PixPayment() {
       if (response.status === 200 && response.data) {
         setPixData(response.data.data); // Atualiza os dados do PIX
       } else {
-        console.error("Erro ao buscar os dados do PIX");
+        setError("Erro ao recuperar os dados do PIX.");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao buscar os dados do PIX", error);
+      if (error.response && error.response.data) {
+        setError(
+          error.response.data.message || "Erro ao processar o pagamento",
+        );
+      } else {
+        setError("Erro desconhecido ao buscar os dados do PIX.");
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  // Função para copiar o código PIX Copia e Cola
+  // 🔥 **Verificação de pagamento por intervalo**
+  const checkPaymentStatus = async () => {
+    try {
+      const cookies = nookies.get(null);
+      const invoiceIds = JSON.parse(cookies.payment_invoices || "[]");
+
+      if (invoiceIds.length === 0) {
+        setError("ID de fatura não encontrado.");
+        return;
+      }
+
+      const response = await nextApi.post("/validate", { id: invoiceIds[0] });
+
+      if (response.status === 200 && response.data) {
+        const { status } = response.data.data;
+
+        // Se o status for **false**, o pagamento foi confirmado
+        if (!status) {
+          clearInterval(intervalRef.current!);
+          setPaymentConfirmed(true);
+          nookies.destroy(null, "payment_invoices", { path: "/" });
+        }
+      }
+    } catch (error) {
+      console.error("Erro ao verificar o status do pagamento", error);
+      setError("Erro ao verificar o pagamento. Tente novamente mais tarde.");
+    }
+  };
+
+  // 🔥 **Função para copiar o código PIX Copia e Cola**
   const handleCopy = () => {
     if (pixData?.pixCopiaECola) {
       navigator.clipboard.writeText(pixData.pixCopiaECola);
@@ -67,7 +105,7 @@ export function PixPayment() {
     }
   };
 
-  // Função para abrir o modal e iniciar o resgate dos dados
+  // 🔥 **Função para abrir o modal e iniciar o resgate dos dados**
   const handleOpen = () => {
     setOpen(true);
     setPixData(null); // Limpa os dados do PIX ao abrir o modal
@@ -81,11 +119,17 @@ export function PixPayment() {
     nookies.destroy(null, "payment_invoices", { path: "/minhas-faturas" }); // Deleta o cookie ao fechar o modal
   };
 
-  // Usando useEffect para garantir que o cookie seja lido assim que o modal é aberto
+  // 🔥 **Inicia o intervalo de verificação do pagamento**
   useEffect(() => {
     if (open) {
-      fetchPixData(); // Garantir que a função de buscar os dados seja chamada quando o modal abrir
+      intervalRef.current = setInterval(() => {
+        checkPaymentStatus();
+      }, 1000); // Verificação a cada 1 segundo
     }
+
+    return () => {
+      clearInterval(intervalRef.current!); // Para o intervalo ao desmontar
+    };
   }, [open]);
 
   return (
@@ -98,14 +142,23 @@ export function PixPayment() {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="relative w-96 rounded-lg bg-white p-6 shadow-lg">
             <button
-              onClick={handleClose} // Fecha o modal e deleta o cookie
+              onClick={handleClose}
               className="absolute right-2 top-2 text-gray-500 hover:text-gray-700"
             >
               ×
             </button>
 
-            {loading ? (
+            {paymentConfirmed ? (
+              <div className="flex flex-col items-center">
+                <CheckCircle size={80} className="text-green-600" />
+                <h2 className="mt-4 text-lg font-bold text-gray-800">
+                  PIX realizado com sucesso!
+                </h2>
+              </div>
+            ) : loading ? (
               <p className="text-center">Carregando dados do PIX...</p>
+            ) : error ? (
+              <p className="text-center text-red-500">{error}</p>
             ) : pixData ? (
               <>
                 <h2 className="mb-4 text-center text-lg font-bold text-gray-800">
@@ -139,7 +192,6 @@ export function PixPayment() {
                     </button>
                   </div>
                 </div>
-
                 <div className="mt-6 space-y-2">
                   <div className="flex justify-between text-sm text-gray-600">
                     <span>Data de Vencimento:</span>
@@ -157,10 +209,10 @@ export function PixPayment() {
 
                 <div className="mt-6 flex justify-center">
                   <button
-                    onClick={() => setIsPaid(true)}
-                    className="w-full rounded-md bg-green-600 py-2 text-white hover:bg-green-700"
+                    onClick={handleClose}
+                    className="w-full rounded-md bg-gray-400 py-2 font-bold text-black hover:bg-gray-500"
                   >
-                    Simular Pagamento
+                    Fechar
                   </button>
                 </div>
               </>
