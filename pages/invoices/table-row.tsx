@@ -3,6 +3,7 @@ import { Barcode, CreditCard, QrCode } from "lucide-react";
 import { useSelectedItems } from "@/contexts/SelectedItemsContext";
 import nookies from "nookies";
 import { PixPayment } from "../pix/components/PixPayment";
+import { nextApi } from "@/services/next-api"; // Importa a instância de requisição para a API
 
 interface TableRowProps {
   invoice: InvoiceInterface;
@@ -25,6 +26,37 @@ export function TableRow({ invoice }: TableRowProps) {
     });
   };
 
+  const handleDownloadPdf = async (id: number) => {
+    try {
+      const response = await nextApi.post(
+        "/download-ticket",
+        { invoice: id },
+        {
+          responseType: "blob", // Define o tipo de resposta como 'blob' para receber o PDF
+        },
+      );
+
+      if (response.status === 200) {
+        const blob = new Blob([response.data], { type: "application/pdf" });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `fatura-${id}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        console.error("Erro ao fazer o download do PDF");
+        alert("Erro ao fazer o download do PDF. Tente novamente.");
+      }
+    } catch (error) {
+      console.error("Erro ao fazer o download do PDF", error);
+      alert(
+        "Erro ao fazer o download do PDF. Verifique a conexão ou tente novamente.",
+      );
+    }
+  };
+
   return (
     <tr className="hover:bg-cednetGray/30">
       <td className="whitespace-nowrap p-2 text-left text-black">
@@ -42,7 +74,10 @@ export function TableRow({ invoice }: TableRowProps) {
       <td className="whitespace-nowrap p-2 text-black">R$ {invoice.valor}</td>
       <td className="whitespace-nowrap p-2 text-center text-black">
         <div className="flex items-center justify-center space-x-2">
-          <Barcode className="h-5 w-5 text-cednetIcons" />
+          <Barcode
+            className="h-5 w-5 cursor-pointer text-cednetIcons"
+            onClick={() => handleDownloadPdf(invoice.id)}
+          />
           <CreditCard
             className="h-5 w-5 cursor-pointer text-cednetIcons"
             onClick={() => handleIconClick(invoice.id)}

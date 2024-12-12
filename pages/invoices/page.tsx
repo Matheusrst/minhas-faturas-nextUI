@@ -130,7 +130,7 @@ export function Page() {
 
       {selectedItems.length > 0 && (
         <button
-          onClick={handleGoToPayment} // ✅ Salva no cookie e redireciona
+          onClick={handleGoToPayment}
           className="fixed bottom-0 left-0 right-0 cursor-pointer rounded-none bg-cednetBlue px-4 py-4 text-center font-semibold text-cednetWhite hover:bg-cednetButtonHover"
         >
           Ir para o Pagamento...
