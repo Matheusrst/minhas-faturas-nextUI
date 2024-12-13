@@ -1,43 +1,62 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { integration } from './services/integration';
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { integration } from "./services/integration";
+import { appConfig } from "./config/app";
+import { AxiosError } from "axios";
 
-export function middleware(request: NextRequest) {
-  const senssio_tag = process.env.SESSION_TAG as string
+export async function middleware(request: NextRequest) {
+  try {
+    const baseAppToken = process.env.INTEGRATIONS_BASE_SECRET as string;
+    const sessionTag = process.env.SESSION_TAG as string;
 
-  if  (!senssio_tag) {
-    console.log('Nome de seção não definido')
-    return NextResponse.redirect('/')
+    // Validando se existe o token.
+    if (!baseAppToken) {
+      throw new Error(
+        appConfig.errors.custom.envIsUndefined("INTEGRATIONS_BASE_SECRET"),
+      );
+    }
+
+    // Validando se existe o token.
+    if (!sessionTag) {
+      throw new Error(appConfig.errors.custom.envIsUndefined("SESSION_TAG"));
+    }
+
+    const clientSession = request.cookies.get(sessionTag);
+
+    if (!clientSession) {
+      throw new Error(appConfig.errors.back.server.errorClientSession);
+    }
+
+    const response = await integration.get(`/my-invoices/web/validate`, {
+      headers: {
+        "App-Secret": baseAppToken,
+        "my-invoices": clientSession.value,
+      },
+    });
+
+    if (response.status === 200 && response.data) {
+      return NextResponse.next();
+    }
+
+    return NextResponse.redirect(new URL("/", request.url));
+  } catch (error) {
+    if (error instanceof AxiosError && error.response) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+
+    if (error instanceof Error) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+
+    return NextResponse.redirect(new URL("/", request.url));
   }
-
-  // Verifica se o cookie 'authToken' está presente
-  const authToken = request.cookies.get(senssio_tag);
-  console.log(senssio_tag)
-  
-  console.log('Middleware Executado: ', authToken); // Verifica se está entrando no middleware
-
-  // Se o cookie 'authToken' não existir, redireciona para o login
-  if (!authToken) {
-    console.log('Cookie não encontrado, redirecionando para login');
-    return NextResponse.redirect(new URL('/', request.url));
-  }
-
-//   const response = await integration.get(`/my-invoices/web/validate`, {
-//     headers: {
-//         "App-Secret": baseAppToken,
-//         "my-invoices": token,
-//     }
-// })
-
-// if (response.status === 200 && response.data) {
-//     return res.status(response.status).json(response.data)
-// }
-
-  // Caso o cookie esteja presente, permite que a requisição prossiga
-  return NextResponse.next();
 }
 
 // Configuração do matcher para proteger as rotas específicas
 export const config = {
-  matcher: ['/minhas-faturas/:path*', '/pagamento/:path*', '/comprovante/:path*'], // Roteamento protegido
+  matcher: [
+    "/minhas-faturas/:path*",
+    "/pagamento/:path*",
+    "/comprovante/:path*",
+  ], // Roteamento protegido
 };

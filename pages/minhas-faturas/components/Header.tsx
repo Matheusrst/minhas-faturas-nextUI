@@ -45,7 +45,7 @@ export function Header() {
         </button>
         <div className="relative">
           <button
-            className="flex h-8 w-8 items-center justify-center rounded bg-blue-800 hover:bg-blue-900"
+            className="mr-4 flex h-8 w-8 items-center justify-center rounded bg-blue-800 hover:bg-blue-900"
             onClick={handleGoToPayment}
           >
             <ShoppingCart className="h-5 w-5 text-white" />
