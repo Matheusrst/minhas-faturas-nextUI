@@ -8,9 +8,16 @@ import Link from "next/link";
 import nookies from "nookies";
 import { useSelectedItems } from "@/contexts/SelectedItemsContext";
 
+interface UserData {
+  razao: string;
+  id: number;
+  cnpj_cpf: string;
+}
+
 export function Page() {
   const router = useRouter();
   const { selectedItems, selectAllItems, clearAllItems } = useSelectedItems();
+  const [userName, setUserName] = useState<string | null>(null); // Estado para armazenar o nome do usuário
 
   const [params, setParams] = useState<FiltersProps>(() => ({
     fields: "id,valor,data_vencimento,status",
@@ -19,6 +26,23 @@ export function Page() {
     order: "desc", //ou asc
     filters: [],
   }));
+
+  // 🔥 Requisição para buscar o nome do usuário
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await nextApi.post("/authenticated-data");
+
+        if (response.status === 200 && response.data) {
+          setUserName(response.data.data.razao); // Armazena o nome do usuário no estado
+        }
+      } catch (error) {
+        console.error("Erro ao buscar os dados do usuário:", error);
+      }
+    };
+
+    fetchUserData(); // Faz a chamada para a API assim que o componente é montado
+  }, []);
 
   const { data: invoices } = useQuery({
     queryKey: ["invoices", params, router.query],
@@ -95,8 +119,10 @@ export function Page() {
       <div className="w-full max-w-[70vw] rounded-lg bg-cednetWhite p-6 shadow-md">
         <p className="mb-4 text-[1rem] font-medium text-black">
           Bem vindo,
-          <br /> <strong>Luan Vinícius Paiva dos Santos!</strong> 😊
+          <br />
+          <strong>{userName ? userName : "Carregando..."}</strong> 😊
         </p>
+
         <div className="scrollbar-custom max-h-[70vh] overflow-x-auto">
           <table className="w-full border-collapse">
             <thead className="bg-cednetGray">
