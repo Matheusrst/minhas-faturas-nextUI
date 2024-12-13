@@ -2,6 +2,7 @@ import { ShoppingCart } from "lucide-react";
 import { useSelectedItems } from "@/contexts/SelectedItemsContext";
 import Link from "next/link";
 import nookies from "nookies";
+import { nextApi } from "@/services/next-api"; // Instância do Axios para fazer a requisição de sign-out
 
 export function Header() {
   const { selectedItems } = useSelectedItems();
@@ -19,6 +20,31 @@ export function Header() {
     }
   };
 
+  const handleSignOut = async () => {
+    try {
+      // Realiza a requisição POST para a API de sign-out, passando os cookies diretamente
+      const response = await nextApi.post("/sign-out");
+
+      nookies.destroy(null, "payment_invoices", { path: "/" });
+      nookies.destroy(null, "my-invoices", { path: "/" });
+
+      if (response.status === 200) {
+        console.log("Logout bem-sucedido!");
+
+        // Limpa os cookies relacionados ao login do usuário
+        nookies.destroy(null, "payment_invoices", { path: "/" });
+        nookies.destroy(null, "my-invoices", { path: "/" });
+
+        // Após o logout, redireciona para a página inicial
+        window.location.href = "/";
+      } else {
+        console.error("Erro ao tentar realizar o sign-out.");
+      }
+    } catch (error) {
+      console.error("Erro ao realizar o sign-out:", error);
+    }
+  };
+
   return (
     <header className="flex items-center justify-between bg-cednetWhite p-4 shadow-md">
       <div className="flex items-center">
@@ -33,13 +59,7 @@ export function Header() {
       <div className="flex items-center space-x-2">
         <button
           className="rounded bg-cednetButton px-2 py-1 text-white hover:bg-cednetButtonHover"
-          onClick={() => {
-            const deleteCookie = (cookieName: string) => {
-              document.cookie = `${cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Strict`;
-            };
-            deleteCookie("my_invoices");
-            window.location.href = "/";
-          }}
+          onClick={handleSignOut} // Chama a função de sign-out
         >
           Nova Consulta
         </button>
