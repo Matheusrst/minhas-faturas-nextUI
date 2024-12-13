@@ -7,16 +7,21 @@ import { NextApiRequest, NextApiResponse } from "next";
 const handler = async function (req: NextApiRequest, res: NextApiResponse) {
   try {
     if (req.method !== 'POST') {
-      throw new Error(appConfig.errors.back.api.incorrectMethod);
+      return res.status(405).json({
+        status: false,
+        message: "Método não permitido. Utilize o método POST.",
+      });
     }
 
     const { invoice } = req.body;
 
     if (!invoice) {
-      throw new Error("O código da fatura não foi informado.");
+      return res.status(400).json({
+        status: false,
+        message: "O código da fatura não foi informado.",
+      });
     }
 
-    // Requisição para a API externa
     const response = await integration.post(
       `/my-invoices/web/invoices/download-ticket`,
       { invoice },
@@ -25,20 +30,14 @@ const handler = async function (req: NextApiRequest, res: NextApiResponse) {
           "App-Secret": req.app_token,
           "my-invoices": req.session_token,
         },
-        responseType: "arraybuffer", 
+        responseType: "arraybuffer",
       }
     );
 
     if (response.status === 200 && response.data) {
-      // Configuração dos cabeçalhos para o arquivo PDF
       res.setHeader("Content-Type", "application/pdf");
-      res.setHeader(
-        "Content-Disposition",
-        `inline; filename="fatura-${invoice}.pdf"`
-      );
-
-      // Envio do arquivo PDF diretamente para a resposta
-      res.status(200).send(response.data);
+      res.setHeader("Content-Disposition", `inline; filename="fatura-${invoice}.pdf"`);
+      return res.status(200).send(response.data);
     } else {
       throw new Error("Erro ao fazer o download do PDF.");
     }
@@ -46,7 +45,11 @@ const handler = async function (req: NextApiRequest, res: NextApiResponse) {
     console.error("Erro na rota /download-ticket", error);
 
     if (error instanceof AxiosError && error.response) {
-      return res.status(error.response.status).json(error.response.data);
+      return res.status(error.response.status).json({
+        status: false,
+        message: error.response.data?.message || "Erro ao tentar baixar a fatura.",
+        data: error.response.data || [],
+      });
     }
 
     if (error instanceof Error) {
@@ -57,7 +60,7 @@ const handler = async function (req: NextApiRequest, res: NextApiResponse) {
       });
     }
 
-    return res.status(400).json({
+    return res.status(500).json({
       status: false,
       message: appConfig.errors.back.api.errorUnknow,
       data: [],

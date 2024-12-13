@@ -4,7 +4,6 @@ import { Barcode, CreditCard, QrCode } from "lucide-react";
 import { useSelectedItems } from "@/contexts/SelectedItemsContext";
 import nookies from "nookies";
 import { PixPayment } from "../pix/components/PixPayment";
-import { nextApi } from "@/services/next-api"; // Importa a instância de requisição para a API
 
 interface TableRowProps {
   invoice: InvoiceInterface;
@@ -13,7 +12,6 @@ interface TableRowProps {
 export function TableRow({ invoice }: TableRowProps) {
   const router = useRouter();
   const { toggleItem, isItemSelected } = useSelectedItems();
-  const [toastMessage, setToastMessage] = useState<string | null>(null); // Estado para controlar o aviso de toast
 
   const handleIconClick = (id: number) => {
     nookies.set(null, "payment_invoices", JSON.stringify([id]), {
@@ -28,36 +26,22 @@ export function TableRow({ invoice }: TableRowProps) {
     });
   };
 
-  const handleDownloadPdf = async (id: number) => {
-    try {
-      const response = await nextApi.post(
-        "/download-ticket",
-        { invoice: id },
-        {
-          responseType: "blob", // Define o tipo de resposta como 'blob' para receber o PDF
-        },
-      );
+  // Função para abrir a fatura em uma nova aba
+  const handleOpenPdf = (id: number) => {
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = "/api/download-ticket";
+    form.target = "_blank"; // Abre em uma nova aba
 
-      if (response.status === 200) {
-        const blob = new Blob([response.data], { type: "application/pdf" });
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `fatura-${id}.pdf`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = "invoice";
+    input.value = id.toString();
 
-        // Exibe o aviso de sucesso
-        setToastMessage("Fatura PDF baixada com sucesso!");
-      } else {
-        console.error("Erro ao fazer o download do PDF");
-        setToastMessage("Erro ao fazer o download do PDF. Tente novamente.");
-      }
-    } catch (error) {
-      console.error("Erro ao fazer o download do PDF", error);
-      setToastMessage("Erro ao fazer o download do PDF. Verifique a conexão.");
-    }
+    form.appendChild(input);
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form); // Remove o formulário após o envio
   };
 
   return (
@@ -77,27 +61,10 @@ export function TableRow({ invoice }: TableRowProps) {
       <td className="whitespace-nowrap p-2 text-black">R$ {invoice.valor}</td>
       <td className="whitespace-nowrap p-2 text-center text-black">
         <div className="flex items-center justify-center space-x-2">
-          <div>
-            <Barcode
-              className="h-5 w-5 cursor-pointer text-cednetIcons"
-              onClick={() => handleDownloadPdf(invoice.id)} // Inicia o download do PDF
-            />
-            {toastMessage && (
-              <div
-                className={`fixed bottom-4 left-1/2 -translate-x-1/2 transform rounded-md p-4 text-white ${
-                  toastMessage.includes("sucesso")
-                    ? "bg-green-500"
-                    : "bg-red-500"
-                }`}
-                style={{
-                  zIndex: 9999, // Garante que o toast ficará visível acima dos outros itens
-                  transition: "opacity 0.5s ease", // Suaviza a entrada/saída do toast
-                }}
-              >
-                {toastMessage}
-              </div>
-            )}
-          </div>
+          <Barcode
+            className="h-5 w-5 cursor-pointer text-cednetIcons"
+            onClick={() => handleOpenPdf(invoice.id)} // Abre o PDF na nova aba
+          />
           <CreditCard
             className="h-5 w-5 cursor-pointer text-cednetIcons"
             onClick={() => handleIconClick(invoice.id)}
