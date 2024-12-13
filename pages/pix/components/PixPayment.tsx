@@ -33,6 +33,7 @@ export function PixPayment() {
   const [error, setError] = useState<string | null>(null);
   const [paymentConfirmed, setPaymentConfirmed] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [isCookieUpdated, setIsCookieUpdated] = useState(false);
 
   // 🔥 **Função para buscar os dados do PIX**
   const fetchPixData = async () => {
@@ -42,6 +43,7 @@ export function PixPayment() {
       const cookies = nookies.get(null);
       const invoiceIds = JSON.parse(cookies.payment_invoices || "[]");
 
+      // Verifique se o ID da fatura foi carregado do cookie
       if (invoiceIds.length === 0) {
         setError("ID de fatura não encontrado.");
         return;
@@ -67,6 +69,34 @@ export function PixPayment() {
       setLoading(false);
     }
   };
+
+  // 🔥 **Função para abrir o modal e iniciar o resgate dos dados**
+  const handleOpen = () => {
+    setOpen(true);
+    setPixData(null); // Limpa os dados do PIX ao abrir o modal
+    setIsCookieUpdated(false); // Resetando estado
+    const cookies = nookies.get(null);
+    const invoiceIds = JSON.parse(cookies.payment_invoices || "[]");
+
+    // Garantir que o cookie tenha sido atualizado antes de buscar os dados
+    if (invoiceIds.length > 0) {
+      setIsCookieUpdated(true); // Marcando que o cookie está atualizado
+    }
+  };
+
+  // Fechar o modal, limpar os dados do PIX e deletar o cookie
+  const handleClose = () => {
+    setOpen(false);
+    setPixData(null); // Limpa os dados do PIX quando fechar o modal
+    nookies.destroy(null, "payment_invoices", { path: "/minhas-faturas" }); // Deleta o cookie ao fechar o modal
+  };
+
+  // 🔥 **Iniciar o fetch somente depois que o cookie for atualizado**
+  useEffect(() => {
+    if (open && isCookieUpdated) {
+      fetchPixData(); // Chama a função de busca assim que o modal abre e o cookie for atualizado
+    }
+  }, [open, isCookieUpdated]);
 
   // 🔥 **Verificação de pagamento por intervalo**
   const checkPaymentStatus = async () => {
@@ -103,20 +133,6 @@ export function PixPayment() {
       navigator.clipboard.writeText(pixData.pixCopiaECola);
       alert("Código PIX copiado com sucesso!");
     }
-  };
-
-  // 🔥 **Função para abrir o modal e iniciar o resgate dos dados**
-  const handleOpen = () => {
-    setOpen(true);
-    setPixData(null); // Limpa os dados do PIX ao abrir o modal
-    fetchPixData(); // Chama a função de busca assim que o modal abre
-  };
-
-  // Fechar o modal, limpar os dados do PIX e deletar o cookie
-  const handleClose = () => {
-    setOpen(false);
-    setPixData(null); // Limpa os dados do PIX quando fechar o modal
-    nookies.destroy(null, "payment_invoices", { path: "/minhas-faturas" }); // Deleta o cookie ao fechar o modal
   };
 
   // 🔥 **Inicia o intervalo de verificação do pagamento**
